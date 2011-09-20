@@ -53,21 +53,15 @@
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.4.1.10715.0\lib\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="EntityFramework.Migrations, Version=0.6.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.Migrations.0.6.0.0\lib\EntityFramework.Migrations.dll</HintPath>
+    </Reference>
     <Reference Include="MarkdownSharp">
       <HintPath>..\packages\MarkdownSharp.1.13.0.0\lib\35\MarkdownSharp.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="Migrator, Version=0.9.0.28138, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MigratorDotNet.0.9.0.28138\lib\Net40\Migrator.dll</HintPath>
-    </Reference>
-    <Reference Include="Migrator.Framework, Version=0.9.0.26940, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MigratorDotNet.0.9.0.28138\lib\Net40\Migrator.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Migrator.Providers, Version=0.9.0.26941, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MigratorDotNet.0.9.0.28138\lib\Net40\Migrator.Providers.dll</HintPath>
-    </Reference>
     <Reference Include="MvcHaack.Ajax">
       <HintPath>..\packages\MvcHaack.Ajax.1.0\lib\net40\MvcHaack.Ajax.dll</HintPath>
     </Reference>
@@ -380,13 +374,11 @@
     <Compile Include="JsonApiController.generated.cs">
       <DependentUpon>T4MVC.tt</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20110816113000_AddIsAdminColumn.cs" />
-    <Compile Include="Migrations\20110821181500_AddElmahSupport.cs" />
-    <Compile Include="Migrations\20110825225500_CreateRolesTable.cs" />
-    <Compile Include="Migrations\20110825230500_CreateUserRolesTable.cs" />
-    <Compile Include="Migrations\20110826215600_AddEmailAllowedColumn.cs" />
-    <Compile Include="Migrations\20110827063348_AddPackageStatistics.cs" />
-    <Compile Include="Migrations\20110903132100_AccountConfirmationColumns.cs" />
+    <Compile Include="Migrations\201109200718144_Initial.cs" />
+    <Compile Include="Migrations\201109200718144_Initial.Designer.cs">
+      <DependentUpon>201109200718144_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Settings.cs" />
     <Compile Include="PackagesController.generated.cs">
       <DependentUpon>T4MVC.tt</DependentUpon>
     </Compile>
@@ -407,27 +399,18 @@
     <Compile Include="UsersController.generated.cs">
       <DependentUpon>T4MVC.tt</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\20110813170000_FixPackageColumnSizes.cs" />
     <Compile Include="ViewModels\ContactOwnersViewModel.cs" />
     <Compile Include="ViewModels\ManagePackageOwnersViewModel.cs" />
     <Compile Include="ViewModels\DeletePackageViewModel.cs" />
     <Compile Include="ViewModels\DependencyViewModel.cs" />
     <Compile Include="ViewModels\IPackageVersionModel.cs" />
     <Compile Include="ViewModels\IPageableEnumerable.cs" />
-    <Compile Include="Migrations\20110811213000_AddApiKeyColumn.cs" />
     <Compile Include="App_Start\Routes.cs" />
-    <Compile Include="Migrations\20110812222000_OnDeleteCascade.cs" />
     <Compile Include="Services\FileSystemService.cs" />
     <Compile Include="Services\IFileSystemService.cs" />
     <Compile Include="Services\IPackageService.cs" />
     <Compile Include="Services\PackageService.cs" />
     <Compile Include="Entities\PackageDependency.cs" />
-    <Compile Include="Migrations\20110804120000_CreateUsersTable.cs" />
-    <Compile Include="Migrations\20110804130000_CreateEmailMessagesTable.cs" />
-    <Compile Include="Migrations\20110804140000_CreatePackageRegistrationsTable.cs" />
-    <Compile Include="Migrations\20110804150000_CreatePackagesTable.cs" />
-    <Compile Include="Migrations\20110804160000_CreatePackageRegistrationOwnersTable.cs" />
-    <Compile Include="Migrations\20110805190000_CreatePackageAuthorsTable.cs" />
     <Compile Include="App_Start\Configuration.cs" />
     <Compile Include="Const.cs" />
     <Compile Include="App_Start\Container.cs" />
@@ -451,7 +434,6 @@
     <Compile Include="Entities\PackageAuthor.cs" />
     <Compile Include="Entities\Package.cs" />
     <Compile Include="Entities\EntityRepository.cs" />
-    <Compile Include="Migrations\20110808110000_CreatePackageDependenciesTable.cs" />
     <Compile Include="RequestModels\DisplayPackageRequest.cs" />
     <Compile Include="Strings.Designer.cs">
       <DependentUpon>Strings.resx</DependentUpon>

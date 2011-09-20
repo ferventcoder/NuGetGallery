@@ -8,7 +8,8 @@ using MvcMiniProfiler.Data;
 namespace NuGetGallery {
     public class EntitiesContext : DbContext {
         public EntitiesContext()
-            : base(GetConnection("NuGetGallery"), contextOwnsConnection: true) {
+            //: base(GetConnection("NuGetGallery"), contextOwnsConnection: true) {
+            : base("NuGetGallery") {
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder) {
