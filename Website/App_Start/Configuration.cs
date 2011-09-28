@@ -49,5 +49,37 @@ namespace NuGetGallery {
                     (value) => new MailAddress(value));
             }
         }
+
+        public bool UseAwsSimpleStorageService {
+            get {
+                return ReadConfiguration<bool>(
+                   "UseAwsSimpleStorageService",
+                   (value) => bool.Parse(value ?? bool.FalseString));
+            }
+        }
+
+        public string S3Bucket {
+            get {
+                return ReadConfiguration<string>(
+                   "S3Bucket",
+                   (value) => value ?? string.Empty);
+            }
+        }
+
+        public string S3AccessKey {
+            get {
+                return ReadConfiguration<string>(
+                   "S3AccessKey",
+                   (value) => value ?? string.Empty);
+            }
+        }
+
+        public string S3SecretKey {
+            get {
+                return ReadConfiguration<string>(
+                  "S3SecretKey",
+                  (value) => value ?? string.Empty);
+            }
+        }
     }
 }

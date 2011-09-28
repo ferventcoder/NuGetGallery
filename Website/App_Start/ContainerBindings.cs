@@ -50,9 +50,20 @@ namespace NuGetGallery {
                 .To<PackageService>()
                 .InRequestScope();
 
-            Bind<IPackageFileService>()
-                .To<FileSystemPackageFileService>()
+            //doh....need to see configuration to see which type of package file service to use
+            var configuration = new Configuration();
+            if (configuration.UseAwsSimpleStorageService) {
+                
+                Bind<IPackageFileService>()
+                .To<S3PackageFileService>()
                 .InRequestScope();
+
+            } else{
+            
+                Bind<IPackageFileService>()
+                .To<FileSystemPackageFileService>()
+                .InRequestScope();  
+            }
 
             Bind<ICryptographyService>()
                 .To<CryptographyService>()
