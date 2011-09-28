@@ -1,6 +1,6 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)' == ''">
-    <Configuration>Debug</Configuration>
+    <Configuration>Release</Configuration>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -23,7 +23,7 @@
     <MSBuild Projects="..\NuGetGallery.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform);OutDir=$(BuildPath)" />
   </Target>
 
-  <Target Name="RunFacts" DependsOnTargets="Build"> 
+  <Target Name="RunFacts"> 
     <xunit Assembly="$(BuildPath)\NuGetGallery.Facts.dll" Xml="NuGetGallery.Facts.results.xml" />
   </Target>
   
@@ -47,19 +47,19 @@
       To="0" />
   </Target>
   
-  <Target Name="CreateDatabase" DependsOnTargets="Build">
+  <Target Name="CreateDatabase">
     <CreateDatabase
       Connectionstring="$(DbConnection)" />
   </Target>    
 
-  <Target Name="UpdateDatabase" DependsOnTargets="Build;CreateDatabase">
+  <Target Name="UpdateDatabase" DependsOnTargets="CreateDatabase">
     <Migrate
       Provider="SQLServer"
       Connectionstring="$(DbConnection)"
       Migrations="$(MigrationsFile)" />
   </Target>
   
-  <Target Name="BuildViews" DependsOnTargets="Build">
+  <Target Name="BuildViews">
     <MSBuild Projects="..\Website\Website.csproj" Targets="MvcBuildViews" Properties="MvcBuildViews=true;OutDir=$(BuildPath)" />
   </Target>
 

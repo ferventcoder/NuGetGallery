@@ -48,7 +48,9 @@ namespace NuGetGallery {
         }
 
         public static string PackageDownload(this UrlHelper url, string id, string version) {
-            return url.Action(MVC.Packages.DownloadPackage(id, version), protocol: "http");
+            string returnUrl = url.Action(MVC.Packages.DownloadPackage(id, version), protocol: "http");
+            //todo: hack, replace
+            return returnUrl.Replace(":14071/","/");
         }
 
         public static string LogOn(this UrlHelper url) {

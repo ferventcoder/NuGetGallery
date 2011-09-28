@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3D9D438F-93F6-4CDF-AABD-9990063BAD67}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\Get-ConnectionString.ps1 = Scripts\Get-ConnectionString.ps1
+		README.markdown = README.markdown
+		Scripts\Revert-Database.ps1 = Scripts\Revert-Database.ps1
+		Scripts\Update-Database.ps1 = Scripts\Update-Database.ps1
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppHarbor", "Chocolatey\AppHarbor\AppHarbor.csproj", "{69F3EF00-5DF6-4ACF-AD80-A52208D29922}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Website", "Chocolatey\Website\Website.csproj", "{1DACF781-5CD0-4123-8BAC-CD385D864BE5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{69F3EF00-5DF6-4ACF-AD80-A52208D29922}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69F3EF00-5DF6-4ACF-AD80-A52208D29922}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DACF781-5CD0-4123-8BAC-CD385D864BE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DACF781-5CD0-4123-8BAC-CD385D864BE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DACF781-5CD0-4123-8BAC-CD385D864BE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DACF781-5CD0-4123-8BAC-CD385D864BE5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

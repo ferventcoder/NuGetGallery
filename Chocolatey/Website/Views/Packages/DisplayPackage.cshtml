@@ -1,0 +1,148 @@
+﻿@model DisplayPackageViewModel
+@{
+    ViewBag.Tab = "Packages";
+}
+<div id="layout-main" class="group">
+    <div id="layout-content" class="group">
+        @if (TempData.ContainsKey("Message")) {
+            <div id="messages">
+                <div class="zone zone-messages">
+                    <div class="message message-Information">@TempData["Message"]</div>
+                </div>
+            </div>
+        }
+        <div id="content" class="group">
+            <div class="zone zone-content">
+                <section class="packageItemDetail icon">
+                    <div id="thumbnails">
+                        <div class="packageLogo">
+                            <img src="@(Model.IconUrl ?? @Links.Content.Images.packageDefaultIcon_png)" alt="Icon for package @Model.Id" />
+                        </div>
+                    </div>
+                    <div>
+                        <header>
+                            <div class="title">
+                                <h2>@Model.Title</h2>
+                                <h3>
+                                    @Model.Version
+                                    @if (Model.Prerelease) { 
+                                    <span class="prerelease">Prerelease</span>
+                                    }
+                                    else if (Model.LatestVersion) {
+                                        <span class="latest">Latest Version</span>
+                                    }
+                                </h3>
+                            </div>
+                            <div class="description">
+                                <p>
+                                    @Model.Description
+                                </p>
+                                <p>
+                                    To install @Model.Title, run the following command from the command line or from PowerShell:
+                                    <div class="commandWrapper">
+                                        <div class="commandPrompt">
+                                            <p class="command">C:\&gt; cinst @Model.Id @if (!Model.LatestVersion) {<text> -version @Model.Version</text>}</p>
+                                        </div>
+                                    </div>
+                                </p>
+                            </div>
+                        </header>
+                                        
+                        <h4 class="details-header">Packages details</h4>
+                        @if (Model.IsOwner(User)) {
+                            <div class="package-owner-actions">
+                                <ul>
+                                    <li><a class="edit" href="@Url.EditPackage(Model)">Edit</a></li>
+                                    <li><a class="manage-owners" href="@Url.ManagePackageOwners(Model)">Manage Owners</a></li>
+                                    <li><a href="@Url.DeletePackage(Model)" class="delete">Delete</a></li>
+                                </ul>
+                            </div>
+                        }
+                        <ul class="links">
+                            @if (!String.IsNullOrEmpty(Model.ProjectUrl)) {
+                                <li><a href="@Model.ProjectUrl" title="Visit the project site to learn more about this package">
+                                    Project site</a></li>
+                            }
+                            @if (!String.IsNullOrEmpty(Model.LicenseUrl)) {
+                                <li><a href="@Model.LicenseUrl" title="Make sure you agree with the license">License</a></li>
+                            }
+                            <li><a href="@Url.Action(MVC.Packages.ReportAbuse(Model.Id, Model.Version))" title="Report Abuse">Report Abuse</a></li>
+                            <li><a href="@Url.Action(MVC.Packages.ContactOwners(Model.Id))">Contact Owners</a></li>
+                            <li><a href="@Url.PackageDownload(Model.Id, Model.Version)">Download</a></li>
+                        </ul>
+
+                        @Html.Partial("_PackageDetailsTable", Model)
+
+                        <div class="stats">
+                            <span class="downloads">
+                                <strong>@Model.TotalDownloadCount</strong>
+                                <label>total downloads</label>
+                            </span>
+                            <span class="downloads">
+                                <strong>@Model.DownloadCount</strong>
+                                <label>for this version</label>
+                            </span>
+                        </div>
+
+                        <h4 class="details-header">Dependencies</h4>
+                        @if (Model.Dependencies.Any()) {
+                            <table class="packages dependencies">
+                                <thead>
+                                    <tr class="header">
+                                        <th style="width: 10%;">Id</th>
+                                        <th class="version">Version Range</th>
+                                    </tr>
+                                </thead>
+                            @foreach (var dependency in Model.Dependencies) {
+                                <tr>
+                                    <td style="width: auto;"><a href="@Url.Package(dependency.Id)">@dependency.Id</a></td>
+                                    <td>@dependency.VersionSpec</td>
+                                </tr>
+                            }
+                            </table>
+                        }
+                        else {
+                            <div class="dependencies">
+                                <em>No Dependencies</em>
+                            </div>
+                        }                            
+                        <h4 class="details-header">Version history</h4>
+                        <table class="packages" cellpadding="0" cellspacing="0">
+                            <thead>
+                                <tr class="header">
+                                    <th class="version">
+                                        Version
+                                    </th>
+                                    <th class="downloads">
+                                        Downloads
+                                    </th>
+                                    <th class="lastUpdated">
+                                        Last updated
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var packageVersion in Model.PackageVersions) {
+                                    <tr class="versionTableRow @if (packageVersion.LatestVersion) {<text>recommended </text>} @if (packageVersion.IsCurrent(Model)) {<text>current</text>} ">
+                                        <td class="version" @if (packageVersion.LatestVersion) {<text>title="Latest Version"</text>}>
+                                            @if (!packageVersion.IsCurrent(Model)) {
+                                                <a href="@Url.Package(packageVersion)">@packageVersion.Title @packageVersion.Version</a>
+                                            }
+                                            else {
+                                                <span>@packageVersion.Title @packageVersion.Version</span>
+                                            }
+                                        </td>
+                                        <td class="downloads">@packageVersion.DownloadCount
+                                        </td>
+                                        <td class="lastUpdated">@packageVersion.LastUpdated.ToString("D")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
