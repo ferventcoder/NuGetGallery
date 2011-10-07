@@ -894,9 +894,6 @@
     <Content Include="..\..\Website\Content\MainNav.css">
       <Link>Content\MainNav.css</Link>
     </Content>
-    <Content Include="..\..\Website\Content\nuget.css">
-      <Link>Content\nuget.css</Link>
-    </Content>
     <Content Include="..\..\Website\Content\orchard.css">
       <Link>Content\orchard.css</Link>
     </Content>
@@ -1119,6 +1116,7 @@
     <Content Include="Content\Images\userIcon.png" />
     <Content Include="Content\Images\userIconWhite.png" />
     <Content Include="Content\Images\xmark.png" />
+    <Content Include="Content\nuget.css" />
     <Content Include="Content\nuget.ico" />
     <Content Include="Content\Images\sendMessageGraphic.png" />
     <Content Include="Web.config">
