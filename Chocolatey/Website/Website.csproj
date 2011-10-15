@@ -58,6 +58,9 @@
     <Reference Include="EntityFramework">
       <HintPath>..\..\packages\EntityFramework.4.1.10715.0\lib\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="EntityFramework.Migrations">
+      <HintPath>..\..\packages\EntityFramework.Migrations.0.7.0.0\lib\net40\EntityFramework.Migrations.dll</HintPath>
+    </Reference>
     <Reference Include="MarkdownSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MarkdownSharp.1.13.0.0\lib\35\MarkdownSharp.dll</HintPath>
     </Reference>
@@ -69,6 +72,12 @@
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\Website\_bin_deployableAssemblies\Microsoft.WindowsAzure.ServiceRuntime.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\Website\_bin_deployableAssemblies\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
     </Reference>
     <Reference Include="Migrator, Version=0.9.0.28138, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MigratorDotNet.0.9.0.28138\lib\Net40\Migrator.dll</HintPath>
@@ -92,9 +101,9 @@
     <Reference Include="Ninject.Web.Mvc">
       <HintPath>..\..\packages\Ninject.MVC3.2.2.2.0\lib\net40-Full\Ninject.Web.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Core, Version=1.5.20818.9011, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+    <Reference Include="NuGet.Core, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NuGet.Core.1.5.20818.9011\lib\net40-Client\NuGet.Core.dll</HintPath>
+      <HintPath>..\..\packages\NuGet.Core.1.6.0\lib\net40-Client\NuGet.Core.dll</HintPath>
     </Reference>
     <Reference Include="ODataNullPropagationVisitor">
       <HintPath>..\..\packages\ODataNullPropagationVisitor.0.5.4237.2641\lib\net40\ODataNullPropagationVisitor.dll</HintPath>
@@ -171,11 +180,17 @@
       <Link>App_Start\NinjectMVC3.cs</Link>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="..\..\Website\App_Start\PackageStoreType.cs">
+      <Link>App_Start\PackageStoreType.cs</Link>
+    </Compile>
     <Compile Include="..\..\Website\App_Start\Routes.cs">
       <Link>App_Start\Routes.cs</Link>
     </Compile>
     <Compile Include="..\..\Website\App_Start\VersionRouteConstraint.cs">
       <Link>App_Start\VersionRouteConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Website\BuildTasks\UpdateDatabase.cs">
+      <Link>BuildTasks\UpdateDatabase.cs</Link>
     </Compile>
     <Compile Include="..\..\Website\Const.cs">
       <Link>Const.cs</Link>
@@ -187,9 +202,6 @@
     <Compile Include="..\..\Website\AuthenticationController.generated.cs">
       <Link>AuthenticationController.generated.cs</Link>
       <DependentUpon>T4MVC.tt</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\Website\BuildTasks\CreateDatabase.cs">
-      <Link>BuildTasks\CreateDatabase.cs</Link>
     </Compile>
     <Compile Include="..\..\Website\Controllers\ApiController.cs">
       <Link>Controllers\ApiController.cs</Link>
@@ -212,18 +224,28 @@
     <Compile Include="..\..\Website\Controllers\UsersController.cs">
       <Link>Controllers\UsersController.cs</Link>
     </Compile>
-    <Compile Include="..\..\Website\DataServices\FeedPackage.cs">
-      <Link>DataServices\FeedPackage.cs</Link>
+    <Compile Include="..\..\Website\DataServices\FeedContext.cs">
+      <Link>DataServices\FeedContext.cs</Link>
     </Compile>
-    <Compile Include="..\..\Website\DataServices\Feeds.svc.cs">
-      <Link>DataServices\Feeds.svc.cs</Link>
-      <DependentUpon>Feeds.svc</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\Website\DataServices\FeedsContext.cs">
-      <Link>DataServices\FeedsContext.cs</Link>
+    <Compile Include="..\..\Website\DataServices\FeedServiceBase.cs">
+      <Link>DataServices\FeedServiceBase.cs</Link>
     </Compile>
     <Compile Include="..\..\Website\DataServices\PackageExtensions.cs">
       <Link>DataServices\PackageExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Website\DataServices\V1FeedPackage.cs">
+      <Link>DataServices\V1FeedPackage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Website\DataServices\V1Feeds.svc.cs">
+      <Link>DataServices\V1Feeds.svc.cs</Link>
+      <DependentUpon>V1Feeds.svc</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\Website\DataServices\V2Feed.svc.cs">
+      <Link>DataServices\V2Feed.svc.cs</Link>
+      <DependentUpon>V2Feed.svc</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\Website\DataServices\V2FeedPackage.cs">
+      <Link>DataServices\V2FeedPackage.cs</Link>
     </Compile>
     <Compile Include="..\..\Website\DynamicData\Content\GridViewPager.ascx.cs">
       <Link>DynamicData\Content\GridViewPager.ascx.cs</Link>
@@ -574,41 +596,22 @@
       <Link>JsonApiController.generated.cs</Link>
       <DependentUpon>T4MVC.tt</DependentUpon>
     </Compile>
-    <Compile Include="..\..\Website\Migrations\20110804120000_CreateUsersTable.cs">
-      <Link>Migrations\20110804120000_CreateUsersTable.cs</Link>
+    <Compile Include="..\..\Website\Migrations\201110060711357_Initial.cs">
+      <Link>Migrations\201110060711357_Initial.cs</Link>
     </Compile>
-    <Compile Include="..\..\Website\Migrations\20110804130000_CreateEmailMessagesTable.cs">
-      <Link>Migrations\20110804130000_CreateEmailMessagesTable.cs</Link>
+    <Compile Include="..\..\Website\Migrations\201110060711357_Initial.designer.cs">
+      <Link>Migrations\201110060711357_Initial.designer.cs</Link>
+      <DependentUpon>201110060711357_Initial.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\Website\Migrations\20110804140000_CreatePackageRegistrationsTable.cs">
-      <Link>Migrations\20110804140000_CreatePackageRegistrationsTable.cs</Link>
+    <Compile Include="..\..\Website\Migrations\201110102157002_PrereleaseChanges.cs">
+      <Link>Migrations\201110102157002_PrereleaseChanges.cs</Link>
     </Compile>
-    <Compile Include="..\..\Website\Migrations\20110804150000_CreatePackagesTable.cs">
-      <Link>Migrations\20110804150000_CreatePackagesTable.cs</Link>
+    <Compile Include="..\..\Website\Migrations\201110102157002_PrereleaseChanges.designer.cs">
+      <Link>Migrations\201110102157002_PrereleaseChanges.designer.cs</Link>
+      <DependentUpon>201110102157002_PrereleaseChanges.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\Website\Migrations\20110804160000_CreatePackageRegistrationOwnersTable.cs">
-      <Link>Migrations\20110804160000_CreatePackageRegistrationOwnersTable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Migrations\20110805190000_CreatePackageAuthorsTable.cs">
-      <Link>Migrations\20110805190000_CreatePackageAuthorsTable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Migrations\20110808110000_CreatePackageDependenciesTable.cs">
-      <Link>Migrations\20110808110000_CreatePackageDependenciesTable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Migrations\20110812222000_OnDeleteCascade.cs">
-      <Link>Migrations\20110812222000_OnDeleteCascade.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Migrations\20110821181500_AddElmahSupport.cs">
-      <Link>Migrations\20110821181500_AddElmahSupport.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Migrations\20110825225500_CreateRolesTable.cs">
-      <Link>Migrations\20110825225500_CreateRolesTable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Migrations\20110825230500_CreateUserRolesTable.cs">
-      <Link>Migrations\20110825230500_CreateUserRolesTable.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Migrations\20110827063348_AddPackageStatistics.cs">
-      <Link>Migrations\20110827063348_AddPackageStatistics.cs</Link>
+    <Compile Include="..\..\Website\Migrations\Settings.cs">
+      <Link>Migrations\Settings.cs</Link>
     </Compile>
     <Compile Include="..\..\Website\PackagesController.generated.cs">
       <Link>PackagesController.generated.cs</Link>
@@ -634,6 +637,18 @@
     <Compile Include="..\..\Website\RouteNames.cs">
       <Link>RouteNames.cs</Link>
     </Compile>
+    <Compile Include="..\..\Website\Services\CloudBlobClientWrapper.cs">
+      <Link>Services\CloudBlobClientWrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Website\Services\CloudBlobContainerWrapper.cs">
+      <Link>Services\CloudBlobContainerWrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Website\Services\CloudBlobPackageFileService.cs">
+      <Link>Services\CloudBlobPackageFileService.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Website\Services\CloudBlobWrapper.cs">
+      <Link>Services\CloudBlobWrapper.cs</Link>
+    </Compile>
     <Compile Include="..\..\Website\Services\CryptographyService.cs">
       <Link>Services\CryptographyService.cs</Link>
     </Compile>
@@ -648,6 +663,15 @@
     </Compile>
     <Compile Include="..\..\Website\Services\FormsAuthenticationService.cs">
       <Link>Services\FormsAuthenticationService.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Website\Services\ICloudBlob.cs">
+      <Link>Services\ICloudBlob.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Website\Services\ICloudBlobClient.cs">
+      <Link>Services\ICloudBlobClient.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Website\Services\ICloudBlobContainer.cs">
+      <Link>Services\ICloudBlobContainer.cs</Link>
     </Compile>
     <Compile Include="..\..\Website\Services\ICryptographyService.cs">
       <Link>Services\ICryptographyService.cs</Link>
@@ -912,8 +936,11 @@
     <Content Include="..\..\Website\Content\Widgets.css">
       <Link>Content\Widgets.css</Link>
     </Content>
-    <Content Include="..\..\Website\DataServices\Feeds.svc">
-      <Link>DataServices\Feeds.svc</Link>
+    <Content Include="..\..\Website\DataServices\V1Feeds.svc">
+      <Link>DataServices\V1Feeds.svc</Link>
+    </Content>
+    <Content Include="..\..\Website\DataServices\V2Feed.svc">
+      <Link>DataServices\V2Feed.svc</Link>
     </Content>
     <Content Include="..\..\Website\DynamicData\Content\GridViewPager.ascx">
       <Link>DynamicData\Content\GridViewPager.ascx</Link>
