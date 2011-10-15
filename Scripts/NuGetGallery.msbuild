@@ -50,8 +50,8 @@
     <MSBuild Projects="..\Website\Website.csproj" Targets="MvcBuildViews" Properties="MvcBuildViews=true;OutDir=$(BuildPath)" />
   </Target>
 
-  <Target Name="CIBuild" DependsOnTargets="RunFacts;CleanBuildOutput" />
+  <Target Name="CIBuild" DependsOnTargets="Build;RunFacts;CleanBuildOutput" />
 
-  <Target Name="FullBuild" DependsOnTargets="RunFacts;CleanBuildOutput;UpdateDatabase;BuildViews" />
+  <Target Name="FullBuild" DependsOnTargets="Build;RunFacts;CleanBuildOutput;UpdateDatabase;BuildViews" />
 
 </Project>

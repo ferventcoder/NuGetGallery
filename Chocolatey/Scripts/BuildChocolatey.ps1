@@ -21,10 +21,10 @@ if ($connectionString.Trim() -eq "")
 }
 
 
-Write-host "================================================"
-Write-host "UpdateDatabase - $connectionString"
-Write-host "================================================"
-& "$(get-content env:windir)\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe" "$nugetProjFile" /p:DbConnection=$connectionString /t:UpdateDatabase 
+#Write-host "================================================"
+#Write-host "UpdateDatabase - $connectionString"
+#Write-host "================================================"
+#& "$(get-content env:windir)\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe" "$nugetProjFile" /p:DbConnection=$connectionString /t:UpdateDatabase 
 
 Write-host "================================================"
 Write-host "Copying chocolatey items over the nuget defaults"
