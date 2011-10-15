@@ -1,18 +1,24 @@
 using System;
+using System.Net;
 using System.Net.Mail;
 using System.Security.Principal;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
 using AnglicanGeek.MarkdownMailer;
-using Ninject.Modules;
+using Ninject.Modules; 
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.StorageClient;
 
-namespace NuGetGallery {
-    public class ContainerBindings : NinjectModule {
-        public override void Load() {
+namespace NuGetGallery
+{
+    public class ContainerBindings : NinjectModule
+    {
+        public override void Load()
+        {
+            IConfiguration configuration = new Configuration();
             Bind<IConfiguration>()
-                .To<Configuration>()
-                .InSingletonScope();
+                .ToMethod(context => configuration);
 
             Bind<EntitiesContext>()
                 .ToMethod(context => new EntitiesContext())
@@ -50,21 +56,6 @@ namespace NuGetGallery {
                 .To<PackageService>()
                 .InRequestScope();
 
-            //doh....need to see configuration to see which type of package file service to use
-            var configuration = new Configuration();
-            if (configuration.UseAwsSimpleStorageService) {
-                
-                Bind<IPackageFileService>()
-                .To<S3PackageFileService>()
-                .InRequestScope();
-
-            } else{
-            
-                Bind<IPackageFileService>()
-                .To<FileSystemPackageFileService>()
-                .InRequestScope();  
-            }
-
             Bind<ICryptographyService>()
                 .To<CryptographyService>()
                 .InRequestScope();
@@ -73,23 +64,43 @@ namespace NuGetGallery {
                 .To<FormsAuthenticationService>()
                 .InSingletonScope();
 
-            Bind<IFileSystemService>()
-                .To<FileSystemService>()
-                .InSingletonScope();
-
             Bind<IControllerFactory>()
                 .To<NuGetControllerFactory>()
                 .InRequestScope();
 
-            Lazy<IMailSender> mailSenderThunk = new Lazy<IMailSender>(() => {
-                var mailSenderConfiguration = new MailSenderConfiguration() {
-                    DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory,
-                    PickupDirectoryLocation = HostingEnvironment.MapPath("~/App_Data/Mail")
-                };
+            Lazy<IMailSender> mailSenderThunk = null;
+            if (configuration.UseSmtp)
+            {
+                mailSenderThunk = new Lazy<IMailSender>(() =>
+                {
+                    var mailSenderConfiguration = new MailSenderConfiguration()
+                    {
+                        DeliveryMethod = SmtpDeliveryMethod.Network,
+                        Host = configuration.SmtpHost,
+                        Port = configuration.SmtpPort,
+                        EnableSsl = configuration.SmtpEnableSsl,
+                        UseDefaultCredentials = false,
+                        Credentials = new NetworkCredential(
+                            configuration.SmtpUsername,
+                            configuration.SmtpPassword)
+                    };
 
-                return new MailSender(mailSenderConfiguration);
-            });
+                    return new MailSender(mailSenderConfiguration);
+                });
+            }
+            else
+            {
+                mailSenderThunk = new Lazy<IMailSender>(() =>
+                {
+                    var mailSenderConfiguration = new MailSenderConfiguration()
+                    {
+                        DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory,
+                        PickupDirectoryLocation = HostingEnvironment.MapPath("~/App_Data/Mail")
+                    };
 
+                    return new MailSender(mailSenderConfiguration);
+                });
+            }
             Bind<IMailSender>()
                 .ToMethod(context => mailSenderThunk.Value);
 
@@ -97,6 +108,37 @@ namespace NuGetGallery {
                 .To<MessageService>();
 
             Bind<IPrincipal>().ToMethod(context => HttpContext.Current.User);
+
+            switch (configuration.PackageStoreType)
+            {
+                case PackageStoreType.FileSystem:
+                case PackageStoreType.NotSpecified:
+                    Bind<IFileSystemService>()
+                        .To<FileSystemService>()
+                        .InRequestScope();
+                    Bind<IPackageFileService>()
+                        .To<FileSystemPackageFileService>()
+                        .InRequestScope();
+                    break;
+                case PackageStoreType.AzureStorageBlob:
+                    Bind<ICloudBlobClient>()
+                        .ToMethod(context => new CloudBlobClientWrapper(new CloudBlobClient(
+                            new Uri(configuration.AzureStorageBlobUrl, UriKind.Absolute),
+                            new StorageCredentialsAccountAndKey(configuration.AzureStorageAccountName, configuration.AzureStorageAccessKey))))
+                        .InSingletonScope();
+                    Bind<IPackageFileService>()
+                        .To<CloudBlobPackageFileService>()
+                        .InSingletonScope();
+                    break;
+                case PackageStoreType.AmazonS3Storage:
+                    Bind<IFileSystemService>()
+                        .To<FileSystemService>()
+                        .InRequestScope();
+                    Bind<IPackageFileService>()
+                        .To<S3PackageFileService>()
+                        .InRequestScope();
+                    break;
+            }
         }
     }
 }

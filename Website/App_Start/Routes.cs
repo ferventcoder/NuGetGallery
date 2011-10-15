@@ -3,9 +3,12 @@ using System.Web.Routing;
 using MvcHaack.Ajax;
 using RouteMagic;
 
-namespace NuGetGallery {
-    public static class Routes {
-        public static void RegisterRoutes(RouteCollection routes) {
+namespace NuGetGallery
+{
+    public static class Routes
+    {
+        public static void RegisterRoutes(RouteCollection routes)
+        {
             routes.MapRoute(
                 RouteName.Home,
                 "",
@@ -84,9 +87,19 @@ namespace NuGetGallery {
                 MVC.Api.DeletePackage());
 
             routes.MapServiceRoute(
-                RouteName.ApiFeeds,
+                RouteName.V1ApiFeed,
+                "api/feeds/v1",
+                typeof(V1Feed));
+
+            routes.MapServiceRoute(
+                RouteName.V2ApiFeed,
+                "api/feeds/v2",
+                typeof(V2Feed));
+
+            routes.MapServiceRoute(
+                RouteName.ApiFeed,
                 "api/feeds",
-                typeof(Feeds));
+                typeof(V2Feed));
 
             // Redirected Legacy Routes
 

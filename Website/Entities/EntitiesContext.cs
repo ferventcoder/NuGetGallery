@@ -1,17 +1,17 @@
-﻿using System.Configuration;
-using System.Data.Common;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
-using System.Data.SqlClient;
-using MvcMiniProfiler.Data;
 
-namespace NuGetGallery {
-    public class EntitiesContext : DbContext {
+namespace NuGetGallery
+{
+    public class EntitiesContext : DbContext
+    {
         public EntitiesContext()
-            : base(GetConnection("NuGetGallery"), contextOwnsConnection: true) {
+            : base("NuGetGallery")
+        {
         }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder) {
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
             modelBuilder.Conventions.Remove<IncludeMetadataConvention>();
 
             modelBuilder.Entity<User>()
@@ -84,12 +84,5 @@ namespace NuGetGallery {
             modelBuilder.Entity<PackageDependency>()
                 .HasKey(pd => pd.Key);
         }
-
-        private static DbConnection GetConnection(string connectionStringName) {
-            var setting = ConfigurationManager.ConnectionStrings[connectionStringName];
-            var connection = new SqlConnection(setting.ConnectionString);
-            return ProfiledDbConnection.Get(connection);
-        }
-
     }
 }

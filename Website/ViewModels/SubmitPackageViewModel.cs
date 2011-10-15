@@ -1,6 +1,8 @@
 ﻿
-namespace NuGetGallery {
-    public class SubmitPackageViewModel : IPackageVersionModel {
+namespace NuGetGallery
+{
+    public class SubmitPackageViewModel : IPackageVersionModel
+    {
         public string Id { get; set; }
         public string Version { get; set; }
 
@@ -12,6 +14,6 @@ namespace NuGetGallery {
         public string Summary { get; set; }
         public string Tags { get; set; }
         public string Title { get; set; }
-        public bool UnlistedPackage { get; set; }
+        public bool Listed { get; set; }
     }
 }
