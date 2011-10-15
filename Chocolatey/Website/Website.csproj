@@ -80,15 +80,6 @@
     <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\Website\_bin_deployableAssemblies\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
     </Reference>
-    <Reference Include="Migrator, Version=0.9.0.28138, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MigratorDotNet.0.9.0.28138\lib\Net40\Migrator.dll</HintPath>
-    </Reference>
-    <Reference Include="Migrator.Framework, Version=0.9.0.26940, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MigratorDotNet.0.9.0.28138\lib\Net40\Migrator.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Migrator.Providers, Version=0.9.0.26941, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MigratorDotNet.0.9.0.28138\lib\Net40\Migrator.Providers.dll</HintPath>
-    </Reference>
     <Reference Include="MvcHaack.Ajax, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\MvcHaack.Ajax.1.0.1\lib\net40\MvcHaack.Ajax.dll</HintPath>
