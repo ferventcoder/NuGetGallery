@@ -788,9 +788,6 @@
     <Compile Include="..\..\Website\Views\Packages\Delete.generated.cs">
       <Link>Views\Packages\Delete.generated.cs</Link>
     </Compile>
-    <Compile Include="..\..\Website\Views\Packages\DisplayPackage.generated.cs">
-      <Link>Views\Packages\DisplayPackage.generated.cs</Link>
-    </Compile>
     <Compile Include="..\..\Website\Views\Packages\Edit.generated.cs">
       <Link>Views\Packages\Edit.generated.cs</Link>
     </Compile>
@@ -815,23 +812,11 @@
     <Compile Include="..\..\Website\Views\Packages\_PackageDetailsTable.generated.cs">
       <Link>Views\Packages\_PackageDetailsTable.generated.cs</Link>
     </Compile>
-    <Compile Include="..\..\Website\Views\Pages\Home.generated.cs">
-      <Link>Views\Pages\Home.generated.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Views\Pages\Privacy.generated.cs">
-      <Link>Views\Pages\Privacy.generated.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Views\Pages\Terms.generated.cs">
-      <Link>Views\Pages\Terms.generated.cs</Link>
-    </Compile>
     <Compile Include="..\..\Website\Views\Shared\EditorTemplates\Object.generated.cs">
       <Link>Views\Shared\EditorTemplates\Object.generated.cs</Link>
     </Compile>
     <Compile Include="..\..\Website\Views\Shared\Error.generated.cs">
       <Link>Views\Shared\Error.generated.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Views\Shared\Layout.generated.cs">
-      <Link>Views\Shared\Layout.generated.cs</Link>
     </Compile>
     <Compile Include="..\..\Website\Views\Shared\TwoColumnLayout.generated.cs">
       <Link>Views\Shared\TwoColumnLayout.generated.cs</Link>
@@ -877,6 +862,31 @@
     </Compile>
     <Compile Include="..\..\Website\Views\Users\Thanks.generated.cs">
       <Link>Views\Users\Thanks.generated.cs</Link>
+    </Compile>
+    <Compile Include="Views\Packages\DisplayPackage.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DisplayPackage.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\Home.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Home.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\Privacy.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Privacy.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Pages\Terms.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Terms.cshtml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Shared\Layout.generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Layout.cshtml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -1144,6 +1154,9 @@
     <Content Include="..\..\Website\DynamicData\Site.master">
       <Link>DynamicData\Site.master</Link>
     </Content>
+    <Content Include="..\..\Website\DynamicData\web.config">
+      <Link>DynamicData\web.config</Link>
+    </Content>
     <None Include="..\..\Website\T4MVC.tt">
       <Link>T4MVC.tt</Link>
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -1248,24 +1261,38 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Pages\Home.cshtml" />
+    <Content Include="Views\Pages\Home.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Home.generated.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Shared\Layout.cshtml" />
+    <Content Include="Views\Shared\Layout.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Layout.generated.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Packages\DisplayPackage.cshtml" />
+    <Content Include="Views\Packages\DisplayPackage.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>DisplayPackage.generated.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Pages\Terms.cshtml" />
-    <Content Include="Views\Pages\Privacy.cshtml" />
+    <Content Include="Views\Pages\Terms.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Terms.generated.cs</LastGenOutput>
+    </Content>
+    <Content Include="Views\Pages\Privacy.cshtml">
+      <Generator>RazorGenerator</Generator>
+      <LastGenOutput>Privacy.generated.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Code\" />
-    <Folder Include="Content\Image..\" />
     <Folder Include="DynamicData\CustomPages\" />
   </ItemGroup>
   <ItemGroup>
