@@ -74,13 +74,6 @@
       <Private>True</Private>
       <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\Website\_bin_deployableAssemblies\Microsoft.WindowsAzure.ServiceRuntime.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.StorageClient, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\Website\_bin_deployableAssemblies\Microsoft.WindowsAzure.StorageClient.dll</HintPath>
-    </Reference>
     <Reference Include="MvcHaack.Ajax, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\MvcHaack.Ajax.1.0.1\lib\net40\MvcHaack.Ajax.dll</HintPath>
@@ -153,14 +146,8 @@
       <Link>App_Start\Bootstrapper.cs</Link>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="..\..\Website\App_Start\Configuration.cs">
-      <Link>App_Start\Configuration.cs</Link>
-    </Compile>
     <Compile Include="..\..\Website\App_Start\Container.cs">
       <Link>App_Start\Container.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\App_Start\ContainerBindings.cs">
-      <Link>App_Start\ContainerBindings.cs</Link>
     </Compile>
     <Compile Include="..\..\Website\App_Start\IConfiguration.cs">
       <Link>App_Start\IConfiguration.cs</Link>
@@ -630,18 +617,6 @@
     <Compile Include="..\..\Website\RouteNames.cs">
       <Link>RouteNames.cs</Link>
     </Compile>
-    <Compile Include="..\..\Website\Services\CloudBlobClientWrapper.cs">
-      <Link>Services\CloudBlobClientWrapper.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Services\CloudBlobContainerWrapper.cs">
-      <Link>Services\CloudBlobContainerWrapper.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Services\CloudBlobPackageFileService.cs">
-      <Link>Services\CloudBlobPackageFileService.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Services\CloudBlobWrapper.cs">
-      <Link>Services\CloudBlobWrapper.cs</Link>
-    </Compile>
     <Compile Include="..\..\Website\Services\CryptographyService.cs">
       <Link>Services\CryptographyService.cs</Link>
     </Compile>
@@ -656,15 +631,6 @@
     </Compile>
     <Compile Include="..\..\Website\Services\FormsAuthenticationService.cs">
       <Link>Services\FormsAuthenticationService.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Services\ICloudBlob.cs">
-      <Link>Services\ICloudBlob.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Services\ICloudBlobClient.cs">
-      <Link>Services\ICloudBlobClient.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Website\Services\ICloudBlobContainer.cs">
-      <Link>Services\ICloudBlobContainer.cs</Link>
     </Compile>
     <Compile Include="..\..\Website\Services\ICryptographyService.cs">
       <Link>Services\ICryptographyService.cs</Link>
@@ -864,6 +830,8 @@
     <Compile Include="..\..\Website\Views\Users\Thanks.generated.cs">
       <Link>Views\Users\Thanks.generated.cs</Link>
     </Compile>
+    <Compile Include="App_Start\Configuration.cs" />
+    <Compile Include="App_Start\ContainerBindings.cs" />
     <Compile Include="Views\Packages\DisplayPackage.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
