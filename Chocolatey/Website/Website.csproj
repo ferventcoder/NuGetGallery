@@ -142,10 +142,6 @@
       <Link>App_Start\AuthenticationModule.cs</Link>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="..\..\Website\App_Start\Bootstrapper.cs">
-      <Link>App_Start\Bootstrapper.cs</Link>
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="..\..\Website\App_Start\Container.cs">
       <Link>App_Start\Container.cs</Link>
     </Compile>
@@ -830,8 +826,15 @@
     <Compile Include="..\..\Website\Views\Users\Thanks.generated.cs">
       <Link>Views\Users\Thanks.generated.cs</Link>
     </Compile>
+    <Compile Include="App_Start\BootStrapper.cs" />
     <Compile Include="App_Start\Configuration.cs" />
     <Compile Include="App_Start\ContainerBindings.cs" />
+    <Compile Include="MvcOverrides\CustomMvcHandler.cs" />
+    <Compile Include="MvcOverrides\CustomMvcRouteHandler.cs" />
+    <Compile Include="MvcOverrides\HttpContextDecorator.cs" />
+    <Compile Include="MvcOverrides\HttpContextProxy.cs" />
+    <Compile Include="MvcOverrides\HttpRequestDecorator.cs" />
+    <Compile Include="MvcOverrides\HttpRequestProxy.cs" />
     <Compile Include="Views\Packages\DisplayPackage.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
