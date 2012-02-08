@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using Moq;
 using NuGet;
 using Xunit;
-using System.Web.Routing;
 
 namespace NuGetGallery
 {
@@ -32,13 +32,22 @@ namespace NuGetGallery
             [Fact]
             public void WillReturnConflictIfAPackageWithTheIdAndSemanticVersionAlreadyExists()
             {
+                var version = new SemanticVersion("1.0.42");
                 var nuGetPackage = new Mock<IPackage>();
                 nuGetPackage.Setup(x => x.Id).Returns("theId");
-                nuGetPackage.Setup(x => x.Version).Returns(new SemanticVersion("1.0.42"));
+                nuGetPackage.Setup(x => x.Version).Returns(version);
+
+                var user = new User();
+
+                var packageRegistration = new PackageRegistration { 
+                    Packages = new List<Package> { new Package { Version = version.ToString() } }, 
+                    Owners =  new List<User> { user }
+                };
+
                 var packageSvc = new Mock<IPackageService>();
-                packageSvc.Setup(x => x.FindPackageByIdAndVersion(It.IsAny<string>(), It.IsAny<string>(), true)).Returns(new Package());
+                packageSvc.Setup(x => x.FindPackageRegistrationById(It.IsAny<string>())).Returns(packageRegistration);
                 var userSvc = new Mock<IUserService>();
-                userSvc.Setup(x => x.FindByApiKey(It.IsAny<Guid>())).Returns(new User());
+                userSvc.Setup(x => x.FindByApiKey(It.IsAny<Guid>())).Returns(user);
                 var controller = CreateController(userSvc: userSvc, packageSvc: packageSvc, packageFromInputStream: nuGetPackage.Object);
 
                 // Act
@@ -230,9 +239,24 @@ namespace NuGetGallery
                 // Act
                 var result = controller.VerifyPackageKey(guid, "foo", "1.0.0");
 
-                Assert.IsType<HttpStatusCodeWithBodyResult>(result);
-                var httpStatus = (HttpStatusCodeWithBodyResult)result;
-                Assert.Equal(403, httpStatus.StatusCode);
+                // Assert
+                AssertStatusCodeResult(result, 403, "The specified API key does not provide the authority to push packages.");
+            }
+
+            [Fact]
+            public void VerifyPackageKeyReturnsEmptyResultIfApiKeyExistsAndIdAndVersionAreEmpty()
+            {
+                // Arrange
+                var guid = Guid.NewGuid();
+                var userSvc = new Mock<IUserService>(MockBehavior.Strict);
+                userSvc.Setup(s => s.FindByApiKey(guid)).Returns(new User());
+                var controller = CreateController(userSvc: userSvc);
+
+                // Act
+                var result = controller.VerifyPackageKey(guid, null, null);
+
+                // Assert
+                Assert.IsType<EmptyResult>(result);
             }
 
             [Fact]
@@ -249,9 +273,8 @@ namespace NuGetGallery
                 // Act
                 var result = controller.VerifyPackageKey(guid, "foo", "1.0.0");
 
-                Assert.IsType<HttpStatusCodeWithBodyResult>(result);
-                var httpStatus = (HttpStatusCodeWithBodyResult)result;
-                Assert.Equal(404, httpStatus.StatusCode);
+                // Assert
+                AssertStatusCodeResult(result, 404, "A package with id 'foo' and version '1.0.0' does not exist.");
             }
 
             [Fact]
@@ -268,9 +291,8 @@ namespace NuGetGallery
                 // Act
                 var result = controller.VerifyPackageKey(guid, "foo", "1.0.0");
 
-                Assert.IsType<HttpStatusCodeWithBodyResult>(result);
-                var httpStatus = (HttpStatusCodeWithBodyResult)result;
-                Assert.Equal(403, httpStatus.StatusCode);
+                // Assert
+                AssertStatusCodeResult(result, 403, "The specified API key does not provide the authority to push packages.");
             }
 
             [Fact]
@@ -409,7 +431,15 @@ namespace NuGetGallery
             }
         }
 
-        static ApiController CreateController(
+        private static void AssertStatusCodeResult(ActionResult result, int statusCode, string statusDesc)
+        {
+            Assert.IsType<HttpStatusCodeWithBodyResult>(result);
+            var httpStatus = (HttpStatusCodeWithBodyResult)result;
+            Assert.Equal(statusCode, httpStatus.StatusCode);
+            Assert.Equal(statusDesc, httpStatus.StatusDescription);
+        }
+
+        private static ApiController CreateController(
             Mock<IPackageService> packageSvc = null,
             Mock<IPackageFileService> fileService = null,
             Mock<IUserService> userSvc = null,

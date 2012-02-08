@@ -157,7 +157,7 @@ namespace NuGetGallery
                     currentUser);
 
                 Assert.Equal("theHash", package.Hash);
-                Assert.Equal(Const.Sha512HashAlgorithmId, package.HashAlgorithm);
+                Assert.Equal(Constants.Sha512HashAlgorithmId, package.HashAlgorithm);
             }
 
             [Fact]
@@ -1245,12 +1245,13 @@ namespace NuGetGallery
             Mock<IEntityRepository<PackageStatistics>> packageStatsRepo = null,
             Mock<IPackageFileService> packageFileSvc = null,
             Mock<IEntityRepository<PackageOwnerRequest>> packageOwnerRequestRepo = null,
+            Mock<IIndexingService> indexingSvc = null,
             Action<Mock<PackageService>> setup = null)
         {
             if (cryptoSvc == null)
             {
                 cryptoSvc = new Mock<ICryptographyService>();
-                cryptoSvc.Setup(x => x.GenerateHash(new byte[] { 0, 0, 1, 0, 1, 0, 1, 0 }, Const.Sha512HashAlgorithmId))
+                cryptoSvc.Setup(x => x.GenerateHash(new byte[] { 0, 0, 1, 0, 1, 0, 1, 0 }, Constants.Sha512HashAlgorithmId))
                     .Returns("theHash");
             }
 
@@ -1259,6 +1260,7 @@ namespace NuGetGallery
             packageFileSvc = packageFileSvc ?? new Mock<IPackageFileService>();
             packageStatsRepo = packageStatsRepo ?? new Mock<IEntityRepository<PackageStatistics>>();
             packageOwnerRequestRepo = packageOwnerRequestRepo ?? new Mock<IEntityRepository<PackageOwnerRequest>>();
+            indexingSvc = indexingSvc ?? new Mock<IIndexingService>();
 
             var packageSvc = new Mock<PackageService>(
                 cryptoSvc.Object,
@@ -1266,7 +1268,8 @@ namespace NuGetGallery
                 packageRepo.Object,
                 packageStatsRepo.Object,
                 packageFileSvc.Object,
-                packageOwnerRequestRepo.Object);
+                packageOwnerRequestRepo.Object,
+                indexingSvc.Object);
 
             packageSvc.CallBase = true;
 

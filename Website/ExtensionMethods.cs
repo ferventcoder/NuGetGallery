@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Services;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Mail;
@@ -60,7 +61,7 @@ namespace NuGetGallery
 
         static string FlattenDependencies(IEnumerable<Tuple<string, string>> dependencies)
         {
-            return String.Join("|", dependencies.Select(d => String.Format("{0}:{1}", d.Item1, d.Item2)).ToArray());
+            return String.Join("|", dependencies.Select(d => String.Format(CultureInfo.InvariantCulture, "{0}:{1}", d.Item1, d.Item2)).ToArray());
         }
 
         public static HelperResult Flatten<T>(this IEnumerable<T> items, Func<T, HelperResult> template)
@@ -115,7 +116,7 @@ namespace NuGetGallery
             {
                 return false;
             }
-            return package.Owners.Any(u => u.Username == user.Identity.Name);
+            return user.IsInRole(Constants.AdminRoleName) || package.Owners.Any(u => u.Username == user.Identity.Name);
         }
 
         public static bool IsOwner(this PackageRegistration package, User user)
@@ -137,14 +138,14 @@ namespace NuGetGallery
             return count == 1 ? singular : plural;
         }
 
-        public static bool IsInThePast(this DateTime? datetime)
+        public static bool IsInThePast(this DateTime? date)
         {
-            return datetime.Value.IsInThePast();
+            return date.Value.IsInThePast();
         }
 
-        public static bool IsInThePast(this DateTime datetime)
+        public static bool IsInThePast(this DateTime date)
         {
-            return datetime < DateTime.UtcNow;
+            return date < DateTime.UtcNow;
         }
 
         public static IQueryable<T> SortBy<T>(this IQueryable<T> source, string sortExpression)

@@ -1086,7 +1086,6 @@ namespace NuGetGallery
         }
 
         static PackagesController CreateController(
-            Mock<ICryptographyService> cryptoSvc = null,
             Mock<IPackageService> packageSvc = null,
             Mock<IUploadFileService> uploadFileSvc = null,
             Mock<IUserService> userSvc = null,
@@ -1094,21 +1093,23 @@ namespace NuGetGallery
             Mock<HttpContextBase> httpContext = null,
             Mock<IIdentity> fakeIdentity = null,
             Mock<IPackage> fakeNuGetPackage = null,
+            Mock<ISearchService> searchService = null,
             Exception readPackageException = null)
         {
 
-            cryptoSvc = cryptoSvc ?? new Mock<ICryptographyService>();
             packageSvc = packageSvc ?? new Mock<IPackageService>();
             uploadFileSvc = uploadFileSvc ?? new Mock<IUploadFileService>();
             userSvc = userSvc ?? new Mock<IUserService>();
             messageSvc = messageSvc ?? new Mock<IMessageService>();
+            searchService = searchService ?? CreateSearchService();
+            
 
             var controller = new Mock<PackagesController>(
-                cryptoSvc.Object,
                     packageSvc.Object,
                     uploadFileSvc.Object,
                     userSvc.Object,
-                    messageSvc.Object);
+                    messageSvc.Object,
+                    searchService.Object);
             controller.CallBase = true;
 
             if (httpContext != null)
@@ -1129,6 +1130,15 @@ namespace NuGetGallery
                 controller.Setup(x => x.ReadNuGetPackage(It.IsAny<Stream>())).Returns(new Mock<IPackage>().Object);
 
             return controller.Object;
+        }
+
+        private static Mock<ISearchService> CreateSearchService()
+        {
+            var searchService = new Mock<ISearchService>();
+            searchService.Setup(s => s.Search(It.IsAny<IQueryable<Package>>(), It.IsAny<string>())).Returns((IQueryable<Package> p, string searchTerm) => p);
+            searchService.Setup(s => s.SearchWithRelevance(It.IsAny<IQueryable<Package>>(), It.IsAny<string>())).Returns((IQueryable<Package> p, string searchTerm) => p);
+
+            return searchService;
         }
     }
 }

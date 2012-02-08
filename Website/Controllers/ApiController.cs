@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Web.Mvc;
 using NuGet;
@@ -47,12 +48,16 @@ namespace NuGetGallery
             if (user == null)
                 return new HttpStatusCodeWithBodyResult(HttpStatusCode.Forbidden, string.Format(CultureInfo.CurrentCulture, Strings.ApiKeyNotAuthorized, "push"));
 
-            var package = packageSvc.FindPackageByIdAndVersion(id, version);
-            if (package == null)
-                return new HttpStatusCodeWithBodyResult(HttpStatusCode.NotFound, string.Format(CultureInfo.CurrentCulture, Strings.PackageWithIdAndVersionNotFound, id, version));
+            if (!String.IsNullOrEmpty(id))
+            {
+                // If the id is present, then verify that the user has permission to push for the specific Id \ version combination.
+                var package = packageSvc.FindPackageByIdAndVersion(id, version);
+                if (package == null)
+                    return new HttpStatusCodeWithBodyResult(HttpStatusCode.NotFound, string.Format(CultureInfo.CurrentCulture, Strings.PackageWithIdAndVersionNotFound, id, version));
 
-            if (!package.IsOwner(user))
-                return new HttpStatusCodeWithBodyResult(HttpStatusCode.Forbidden, string.Format(CultureInfo.CurrentCulture, Strings.ApiKeyNotAuthorized, "push"));
+                if (!package.IsOwner(user))
+                    return new HttpStatusCodeWithBodyResult(HttpStatusCode.Forbidden, string.Format(CultureInfo.CurrentCulture, Strings.ApiKeyNotAuthorized, "push"));
+            }
 
             return new EmptyResult();
         }
@@ -73,15 +78,29 @@ namespace NuGetGallery
         {
             var user = userSvc.FindByApiKey(apiKey);
             if (user == null)
-                return new HttpStatusCodeWithBodyResult(HttpStatusCode.Forbidden, string.Format(CultureInfo.CurrentCulture, Strings.ApiKeyNotAuthorized, "push"));
+                return new HttpStatusCodeWithBodyResult(HttpStatusCode.Forbidden, String.Format(CultureInfo.CurrentCulture, Strings.ApiKeyNotAuthorized, "push"));
 
             var packageToPush = ReadPackageFromRequest();
 
-            var package = packageSvc.FindPackageByIdAndVersion(packageToPush.Id, packageToPush.Version.ToString());
-            if (package != null)
-                return new HttpStatusCodeWithBodyResult(HttpStatusCode.Conflict, string.Format(Strings.PackageExistsAndCannotBeModified, packageToPush.Id, packageToPush.Version.ToString()));
+            // Ensure that the user can push packages for this id.
+            var packageRegistration = packageSvc.FindPackageRegistrationById(packageToPush.Id);
+            if (packageRegistration != null)
+            {
+                if (!packageRegistration.IsOwner(user))
+                {
+                    return new HttpStatusCodeWithBodyResult(HttpStatusCode.Forbidden, String.Format(CultureInfo.CurrentCulture, Strings.ApiKeyNotAuthorized, "push"));
+                }
 
-            package = packageSvc.CreatePackage(packageToPush, user);
+                // Check if a particular Id-Version combination already exists. We eventually need to remove this check.
+                bool packageExists = packageRegistration.Packages.Any(p => p.Version.Equals(packageToPush.Version.ToString(), StringComparison.OrdinalIgnoreCase));
+                if (packageExists)
+                {
+                    return new HttpStatusCodeWithBodyResult(HttpStatusCode.Conflict,
+                        String.Format(CultureInfo.CurrentCulture, Strings.PackageExistsAndCannotBeModified, packageToPush.Id, packageToPush.Version.ToString()));
+                }
+            }
+
+            packageSvc.CreatePackage(packageToPush, user);
             return new HttpStatusCodeResult(201);
         }
 
@@ -107,6 +126,14 @@ namespace NuGetGallery
         public virtual ActionResult PublishPackage(Guid key, string id, string version)
         {
             return new EmptyResult();
+        }
+
+        protected override void OnException(ExceptionContext filterContext)
+        {
+            filterContext.ExceptionHandled = true;
+            var exception = filterContext.Exception;
+            var request = filterContext.HttpContext.Request;
+            filterContext.Result = new HttpStatusCodeWithBodyResult(HttpStatusCode.InternalServerError, exception.Message, request.IsLocal ? exception.StackTrace : exception.Message);
         }
 
         protected internal virtual IPackage ReadPackageFromRequest()

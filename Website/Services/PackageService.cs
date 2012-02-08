@@ -10,12 +10,13 @@ namespace NuGetGallery
 {
     public class PackageService : IPackageService
     {
-        readonly ICryptographyService cryptoSvc;
-        readonly IEntityRepository<PackageRegistration> packageRegistrationRepo;
-        readonly IEntityRepository<Package> packageRepo;
-        readonly IEntityRepository<PackageStatistics> packageStatsRepo;
-        readonly IPackageFileService packageFileSvc;
-        readonly IEntityRepository<PackageOwnerRequest> packageOwnerRequestRepository;
+        private readonly ICryptographyService cryptoSvc;
+        private readonly IEntityRepository<PackageRegistration> packageRegistrationRepo;
+        private readonly IEntityRepository<Package> packageRepo;
+        private readonly IEntityRepository<PackageStatistics> packageStatsRepo;
+        private readonly IPackageFileService packageFileSvc;
+        private readonly IEntityRepository<PackageOwnerRequest> packageOwnerRequestRepository;
+        private readonly IIndexingService indexingSvc;
 
         public PackageService(
             ICryptographyService cryptoSvc,
@@ -23,7 +24,8 @@ namespace NuGetGallery
             IEntityRepository<Package> packageRepo,
             IEntityRepository<PackageStatistics> packageStatsRepo,
             IPackageFileService packageFileSvc,
-            IEntityRepository<PackageOwnerRequest> packageOwnerRequestRepository)
+            IEntityRepository<PackageOwnerRequest> packageOwnerRequestRepository,
+            IIndexingService indexingSvc)
         {
             this.cryptoSvc = cryptoSvc;
             this.packageRegistrationRepo = packageRegistrationRepo;
@@ -31,6 +33,7 @@ namespace NuGetGallery
             this.packageStatsRepo = packageStatsRepo;
             this.packageFileSvc = packageFileSvc;
             this.packageOwnerRequestRepository = packageOwnerRequestRepository;
+            this.indexingSvc = indexingSvc;
         }
 
         public Package CreatePackage(IPackage nugetPackage, User currentUser)
@@ -52,7 +55,8 @@ namespace NuGetGallery
                     tx.Complete();
                 }
             }
-            
+
+            NotifyIndexingService();
 
             return package;
         }
@@ -80,6 +84,8 @@ namespace NuGetGallery
                 }
                 tx.Complete();
             }
+
+            NotifyIndexingService();
         }
 
         public virtual PackageRegistration FindPackageRegistrationById(string id)
@@ -135,7 +141,7 @@ namespace NuGetGallery
             else
             {
                 package = packageVersions
-                    .Where(p => p.PackageRegistration.Id.Equals(id, StringComparison.InvariantCultureIgnoreCase) && p.Version.Equals(version, StringComparison.InvariantCultureIgnoreCase))
+                    .Where(p => p.PackageRegistration.Id.Equals(id, StringComparison.OrdinalIgnoreCase) && p.Version.Equals(version, StringComparison.OrdinalIgnoreCase))
                     .SingleOrDefault();
             }
             if (package != null)
@@ -261,12 +267,12 @@ namespace NuGetGallery
                 Description = nugetPackage.Description,
                 ReleaseNotes = nugetPackage.ReleaseNotes,
                 RequiresLicenseAcceptance = nugetPackage.RequireLicenseAcceptance,
-                HashAlgorithm = Const.Sha512HashAlgorithmId,
+                HashAlgorithm = Constants.Sha512HashAlgorithmId,
                 Hash = cryptoSvc.GenerateHash(packageFileStream.ReadAllBytes()),
                 PackageFileSize = packageFileStream.Length,
                 Created = now,
                 LastUpdated = now,
-                Published = DateTime.UtcNow,
+                Published = now,
                 Copyright = nugetPackage.Copyright,
                 IsPrerelease = !nugetPackage.IsReleaseVersion(),
                 Listed = true
@@ -323,7 +329,7 @@ namespace NuGetGallery
                 throw new EntityException(Strings.NuGetPackagePropertyTooLong, "Title", "4000");
         }
 
-        private void UpdateIsLatest(PackageRegistration packageRegistration)
+        private static void UpdateIsLatest(PackageRegistration packageRegistration)
         {
             if (!packageRegistration.Packages.Any())
             {
@@ -344,6 +350,7 @@ namespace NuGetGallery
             if (latestPackage != null)
             {
                 latestPackage.IsLatest = true;
+                latestPackage.LastUpdated = DateTime.UtcNow;
 
                 if (latestPackage.IsPrerelease)
                 {
@@ -354,6 +361,7 @@ namespace NuGetGallery
                     {
                         // We could have no release packages
                         latestReleasePackage.IsLatestStable = true;
+                        latestReleasePackage.LastUpdated = DateTime.UtcNow;
                     }
                 }
                 else
@@ -410,6 +418,7 @@ namespace NuGetGallery
             }
 
             package.Listed = true;
+            package.LastUpdated = DateTime.UtcNow;
 
             UpdateIsLatest(package.PackageRegistration);
 
@@ -429,6 +438,8 @@ namespace NuGetGallery
             }
 
             package.Listed = false;
+            package.LastUpdated = DateTime.UtcNow;
+
             if (package.IsLatest || package.IsLatestStable)
             {
                 UpdateIsLatest(package.PackageRegistration);
@@ -482,7 +493,7 @@ namespace NuGetGallery
 
             if (pendingOwner == null)
             {
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException("pendingOwner");
             }
 
             if (String.IsNullOrEmpty(token))
@@ -510,6 +521,11 @@ namespace NuGetGallery
             return (from request in packageOwnerRequestRepository.GetAll()
                     where request.PackageRegistrationKey == package.Key && request.NewOwnerKey == pendingOwner.Key
                     select request).FirstOrDefault();
+        }
+
+        private void NotifyIndexingService()
+        {
+            indexingSvc.UpdateIndex();
         }
     }
 }

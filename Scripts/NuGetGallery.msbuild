@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <UsingTask AssemblyFile="../3rdParty\xunit\xunit.runner.msbuild.dll" TaskName="Xunit.Runner.MSBuild.xunit" />
-  <UsingTask AssemblyFile="$(BuildPath)\_PublishedWebsites\WebSite\bin\NuGetGallery.Website.dll" TaskName="NuGetGallery.UpdateDatabase" />
+  <UsingTask AssemblyFile="$(SolutionDir)..\Website\bin\NuGetGallery.Website.dll" TaskName="NuGetGallery.UpdateDatabase" />
 
   <Target Name="Clean">
     <MSBuild Projects="..\NuGetGallery.sln" Targets="Clean" Properties="Configuration=$(Configuration);Platform=$(Platform);OutDir=$(BuildPath)"/>
@@ -19,11 +19,11 @@
   </Target>
   
   <Target Name="Build" DependsOnTargets="Clean">
-    <MSBuild Projects="..\NuGetGallery.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform);OutDir=$(BuildPath)" />
+    <MSBuild Projects="..\NuGetGallery.sln" Targets="Build" Properties="Configuration=$(Configuration);Platform=$(Platform);OutDir=$(BuildPath);CodeAnalysis=true;" />
   </Target>
 
   <Target Name="RunFacts" DependsOnTargets="Build"> 
-    <xunit Assembly="$(BuildPath)\NuGetGallery.Facts.dll" Xml="NuGetGallery.Facts.results.xml" />
+    <xunit Assembly="$(SolutionDir)..\Website\bin\NuGetGallery.Facts.dll" Xml="NuGetGallery.Facts.results.xml" />
   </Target>
   
   <Target Name="CleanBuildOutput">   
@@ -46,12 +46,8 @@
     <UpdateDatabase />
   </Target>
   
-  <Target Name="BuildViews" DependsOnTargets="Build">
-    <MSBuild Projects="..\Website\Website.csproj" Targets="MvcBuildViews" Properties="MvcBuildViews=true;OutDir=$(BuildPath)" />
-  </Target>
-
   <Target Name="CIBuild" DependsOnTargets="RunFacts;CleanBuildOutput" />
 
-  <Target Name="FullBuild" DependsOnTargets="RunFacts;CleanBuildOutput;UpdateDatabase;BuildViews" />
+  <Target Name="FullBuild" DependsOnTargets="RunFacts;UpdateDatabase;CleanBuildOutput;" />
 
 </Project>

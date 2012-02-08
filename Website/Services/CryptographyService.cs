@@ -3,16 +3,17 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
+using System.Web.Helpers;
 
 namespace NuGetGallery
 {
     public class CryptographyService : ICryptographyService
     {
-        readonly int saltLengthInBytes = 16;
+        private const int SaltLengthInBytes = 16;
 
         public string GenerateHash(
             byte[] input,
-            string hashAlgorithmId = Const.Sha512HashAlgorithmId)
+            string hashAlgorithmId = Constants.Sha512HashAlgorithmId)
         {
             byte[] hashBytes;
 
@@ -27,9 +28,19 @@ namespace NuGetGallery
 
         public string GenerateSaltedHash(
             string input,
-            string hashAlgorithmId = Const.Sha1HashAlgorithmId)
+            string hashAlgorithmId)
         {
-            var saltBytes = new byte[saltLengthInBytes];
+            if (hashAlgorithmId.Equals(Constants.PBKDF2HashAlgorithmId, StringComparison.OrdinalIgnoreCase))
+            {
+                return Crypto.HashPassword(input);
+            }
+
+            return GenerateLegacySaltedHash(input, hashAlgorithmId);
+        }
+
+        private static string GenerateLegacySaltedHash(string input, string hashAlgorithmId)
+        {
+            var saltBytes = new byte[SaltLengthInBytes];
 
             using (var cryptoProvider = new RNGCryptoServiceProvider())
                 cryptoProvider.GetNonZeroBytes(saltBytes);
@@ -69,7 +80,7 @@ namespace NuGetGallery
         public bool ValidateHash(
             string hash,
             byte[] input,
-            string hashAlgorithmId = Const.Sha512HashAlgorithmId)
+            string hashAlgorithmId = Constants.Sha512HashAlgorithmId)
         {
             return hash.Equals(GenerateHash(input));
         }
@@ -77,12 +88,22 @@ namespace NuGetGallery
         public bool ValidateSaltedHash(
             string hash,
             string input,
-            string hashAlgorithmId = Const.Sha1HashAlgorithmId)
+            string hashAlgorithmId)
+        {
+            if (hashAlgorithmId.Equals(Constants.PBKDF2HashAlgorithmId, StringComparison.OrdinalIgnoreCase))
+            {
+                return Crypto.VerifyHashedPassword(hashedPassword: hash, password: input);
+            }
+
+            return ValidateLegacySaltedHash(hash, input, hashAlgorithmId);
+        }
+
+        private static bool ValidateLegacySaltedHash(string hash, string input, string hashAlgorithmId)
         {
             var saltPlusHashBytes = Convert.FromBase64String(hash);
 
-            var saltBytes = saltPlusHashBytes.Take(saltLengthInBytes).ToArray();
-            var hashToValidateBytes = saltPlusHashBytes.Skip(saltLengthInBytes).ToArray();
+            var saltBytes = saltPlusHashBytes.Take(SaltLengthInBytes).ToArray();
+            var hashToValidateBytes = saltPlusHashBytes.Skip(SaltLengthInBytes).ToArray();
 
             var textBytes = Encoding.Unicode.GetBytes(input);
 

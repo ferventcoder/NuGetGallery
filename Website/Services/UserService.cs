@@ -36,7 +36,7 @@ namespace NuGetGallery
             if (existingUser != null)
                 throw new EntityException(Strings.EmailAddressBeingUsed, emailAddress);
 
-            var hashedPassword = cryptoSvc.GenerateSaltedHash(password);
+            var hashedPassword = cryptoSvc.GenerateSaltedHash(password, Constants.PBKDF2HashAlgorithmId);
 
             var newUser = new User(
                 username,
@@ -45,7 +45,8 @@ namespace NuGetGallery
                     ApiKey = Guid.NewGuid(),
                     EmailAllowed = true,
                     UnconfirmedEmailAddress = emailAddress,
-                    EmailConfirmationToken = cryptoSvc.GenerateToken()
+                    EmailConfirmationToken = cryptoSvc.GenerateToken(),
+                    PasswordHashAlgorithm = Constants.PBKDF2HashAlgorithmId,
                 };
 
             if (!settings.ConfirmEmailAddresses)
@@ -116,9 +117,22 @@ namespace NuGetGallery
                 .SingleOrDefault();
         }
 
-        public virtual User FindByUsernameOrEmailAddressAndPassword(
-            string usernameOrEmail,
-            string password)
+        public virtual User FindByUsernameAndPassword(string username, string password)
+        {
+            // TODO: validate input
+
+            var user = FindByUsername(username);
+
+            if (user == null)
+                return null;
+
+            if (!cryptoSvc.ValidateSaltedHash(user.HashedPassword, password, user.PasswordHashAlgorithm))
+                return null;
+
+            return user;
+        }
+
+        public virtual User FindByUsernameOrEmailAddressAndPassword(string usernameOrEmail, string password)
         {
             // TODO: validate input
 
@@ -128,8 +142,16 @@ namespace NuGetGallery
             if (user == null)
                 return null;
 
-            if (!cryptoSvc.ValidateSaltedHash(user.HashedPassword, password))
+            if (!cryptoSvc.ValidateSaltedHash(user.HashedPassword, password, user.PasswordHashAlgorithm))
+            {
                 return null;
+            }
+            else if (!user.PasswordHashAlgorithm.Equals(Constants.PBKDF2HashAlgorithmId, StringComparison.OrdinalIgnoreCase))
+            {
+                // If the user can be authenticated and they are using an older password algorithm, migrate them to the current one.
+                ChangePasswordInternal(user, password);
+                userRepo.CommitChanges();
+            }
 
             return user;
         }
@@ -150,20 +172,23 @@ namespace NuGetGallery
 
         public bool ChangePassword(string username, string oldPassword, string newPassword)
         {
-            var user = FindByUsernameOrEmailAddressAndPassword(username, oldPassword);
+            // Review: If the old password is hashed using something other than PBKDF2, we end up making an extra db call that changes the old hash password.
+            // This operation is rare enough that I'm not inclined to change it.
+            var user = FindByUsernameAndPassword(username, oldPassword);
             if (user == null)
             {
                 return false;
             }
 
-            ChangePassword(user, newPassword);
+            ChangePasswordInternal(user, newPassword);
             userRepo.CommitChanges();
             return true;
         }
 
-        private void ChangePassword(User user, string newPassword)
+        private void ChangePasswordInternal(User user, string newPassword)
         {
-            var hashedPassword = cryptoSvc.GenerateSaltedHash(newPassword);
+            var hashedPassword = cryptoSvc.GenerateSaltedHash(newPassword, Constants.PBKDF2HashAlgorithmId);
+            user.PasswordHashAlgorithm = Constants.PBKDF2HashAlgorithmId;
             user.HashedPassword = hashedPassword;
         }
 
@@ -189,18 +214,18 @@ namespace NuGetGallery
             return true;
         }
 
-        public User GeneratePasswordResetToken(string email, int tokenExpirationMinutes)
+        public User GeneratePasswordResetToken(string usernameOrEmail, int tokenExpirationMinutes)
         {
-            if (String.IsNullOrEmpty(email))
+            if (String.IsNullOrEmpty(usernameOrEmail))
             {
-                throw new ArgumentNullException("email");
+                throw new ArgumentNullException("usernameOrEmail");
             }
             if (tokenExpirationMinutes < 1)
             {
                 throw new ArgumentException("Token expiration should give the user at least a minute to change their password", "tokenExpirationMinutes");
             }
 
-            var user = FindByEmailAddress(email);
+            var user = FindByEmailAddress(usernameOrEmail);
             if (user == null)
             {
                 return null;
@@ -241,7 +266,7 @@ namespace NuGetGallery
                     throw new InvalidOperationException(Strings.UserIsNotYetConfirmed);
                 }
 
-                ChangePassword(user, newPassword);
+                ChangePasswordInternal(user, newPassword);
                 user.PasswordResetToken = null;
                 user.PasswordResetTokenExpirationDate = null;
                 userRepo.CommitChanges();

@@ -10,14 +10,15 @@ namespace NuGetGallery
 {
     public static class BackgroundTasksSetup
     {
-        static readonly HttpApplication _elmahHttpApplication = new ElmahSignalScopeHttpApplication();
-        static JobManager _jobManager = CreateJobManager();
+        private static readonly HttpApplication _elmahHttpApplication = new ElmahSignalScopeHttpApplication();
+        private static readonly JobManager _jobManager = CreateJobManager();
 
         private static JobManager CreateJobManager()
         {
             var jobs = new IJob[] { 
                 new UpdateStatisticsJob(TimeSpan.FromSeconds(10), () => new EntitiesContext(), timeout: TimeSpan.FromMinutes(5)),
-                new WorkItemCleanupJob(TimeSpan.FromDays(1), () => new EntitiesContext(), timeout: TimeSpan.FromDays(4))
+                new WorkItemCleanupJob(TimeSpan.FromDays(1), () => new EntitiesContext(), timeout: TimeSpan.FromDays(4)),
+                new LuceneIndexingJob(TimeSpan.FromMinutes(10), timeout: TimeSpan.FromMinutes(2)),
             };
 
             var jobCoordinator = new WebFarmJobCoordinator(new EntityWorkItemRepository(() => new EntitiesContext()));
